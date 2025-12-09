@@ -1,0 +1,18 @@
+module TokenTest where
+
+import Daml.Script
+import DA.List
+
+template Token
+  with
+    owner : Party
+  where
+    signatory owner
+
+test_script : Script (ContractId Token)
+test_script = script do
+    assert (([1] ++ [2] ++ [3,4,5]) == (1 :: 2 :: 3 :: 4 :: 5 :: [] : [Int]))
+    owner <- allocateParty "Alicja"
+    submit owner do
+      createCmd Token with owner = owner
+

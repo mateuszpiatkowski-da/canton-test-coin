@@ -1,0 +1,15 @@
+{
+  "name": "meow-coin",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest",
+    "prettier": "^3.7.4"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@canton-network/wallet-sdk": "^0.18.0"
+  }
+}
