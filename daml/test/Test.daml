@@ -1,0 +1,14 @@
+module Test where
+
+import Daml.Script
+import MeowToken
+
+test_token : Script (ContractId MeowToken)
+test_token = script do
+  dso <- allocateParty "DSO"
+  owner <- allocateParty "Owner"
+  submit dso do
+    createCmd MeowToken with
+      dso
+      owner
+      amount = 10.0

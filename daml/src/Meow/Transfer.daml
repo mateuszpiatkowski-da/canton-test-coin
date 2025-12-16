@@ -1,0 +1,41 @@
+module Meow.Transfer where
+
+import MeowToken
+import Splice.Api.Token.TransferInstructionV1
+
+
+template MeowTransferFactory
+  with
+    dso : Party
+    transferData : Transfer
+  where
+    signatory dso
+
+    interface instance TransferFactory for MeowTransferFactory where
+      view = TransferFactoryView with
+        admin = dso
+        meta = meowMetadata
+
+      transferFactory_publicFetchImpl self fetch = do
+        -- Validate that the expected admin matches the actual admin
+        assert (fetch.expectedAdmin == dso)
+        pure TransferFactoryView with
+          admin = dso
+          meta = meowMetadata
+
+      transferFactory_transferImpl self transferArgs = do
+        -- Validate that the expected admin matches the actual admin
+        assert (transferArgs.expectedAdmin == dso)
+
+        -- Create the MeowToken for the receiver
+        receiverTokenCid <- create MeowToken with
+          dso
+          owner = transferArgs.transfer.receiver
+
+        -- Return completed result
+        pure TransferInstructionResult with
+          output = TransferInstructionResult_Completed with
+            receiverHoldingCids = [toInterfaceContractId receiverTokenCid]
+          senderChangeCids = []
+          meta = meowMetadata
+

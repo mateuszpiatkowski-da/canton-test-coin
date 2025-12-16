@@ -1,0 +1,10 @@
+sdk-version: 3.4.9
+name: meow-coin-test
+source: Test.daml
+version: 1.0.0
+dependencies:
+  - daml-prim
+  - daml-stdlib
+  - daml-script
+data-dependencies:
+  - ../.daml/dist/meow-coin-1.0.0.dar

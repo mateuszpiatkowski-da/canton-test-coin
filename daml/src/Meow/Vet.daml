@@ -1,0 +1,147 @@
+module Meow.Vet where
+
+import Meow.Token as MeowToken
+
+-- UTILS
+assertExpirationTime : Time -> Text -> Update ()
+assertExpirationTime expireAt failText = do
+  currentTime <- getTime
+  assertMsg failText (expireAt >= currentTime)
+  pure ()
+
+-- TYPES
+
+data DosageUnit = MG -- "milligram"
+  | ML -- "milliliter"
+  deriving (Eq, Show, Enum)
+
+data DrugDosage = DrugDosage with
+  times : Int
+  amount : Decimal
+  unit : DosageUnit
+    deriving (Eq, Show)
+
+data Drug = Drug with
+  name : Text
+  defaultDosage : DrugDosage
+    deriving (Eq, Show)
+
+data Prescription = Prescription with
+  drug : Drug
+  dosage : Optional DrugDosage
+    deriving (Eq, Show)
+
+data ConsultationParties = ConsultationParties with
+  vet : Party
+  pet : MeowToken
+    deriving (Eq, Show)
+
+data ConsultationData = ConsultationData with
+  notes : Text -- written in Markdown
+  prescriptions : Optional [Prescription]
+  expireAt : Time
+    deriving (Eq, Show)
+
+-- TEMPLATES
+
+template ConsultationResult
+  with
+    parties : ConsultationParties
+    consultationData : ConsultationData
+  where
+    signatory parties.vet
+    observer parties.pet.owner
+
+    choice RequestPrescriptionFilling : ()
+      controller parties.pet.owner
+      do
+        assertExpirationTime consultationData.expireAt "Prescription has expired"
+        pure ()
+
+template VetConsultation
+  with
+    time : Time
+    parties : ConsultationParties
+  where
+    signatory parties.vet
+    observer parties.pet.owner
+
+    choice VetConsultation_Decline : ()
+      controller parties.pet.owner
+      do
+
+        pure ()
+
+    choice VetConsultation_ChangeTime : ContractId VetConsultation
+      with
+        newTime : Time
+      controller parties.pet.owner, parties.vet
+      do
+        create this with
+          time = newTime
+
+    choice VetConsultation_Complete : ContractId ConsultationResult
+      with
+        consultationData : ConsultationData
+      controller parties.vet
+      do
+        create ConsultationResult with
+          parties
+          consultationData
+
+template ConsultationRequest -- created by an owner only
+  with
+    parties : ConsultationParties
+    time : Time
+  where
+    signatory parties.pet.owner
+    observer parties.vet
+
+    choice ConsultationRequest_Accept : ContractId VetConsultation
+      controller parties.vet
+      do
+        create VetConsultation with
+          time
+          parties
+
+    choice ConsultationRequest_Decline : Text
+      with
+        reason : Text
+      controller parties.vet
+      do
+        pure reason
+
+    choice ConsultationRequest_ProposeNewDate : ContractId ConsultationProposal
+      with
+        newTime : Time
+      controller parties.vet
+      do
+        create ConsultationProposal with
+          parties
+          time = newTime
+
+template ConsultationProposal -- created by a vet only
+  with
+    parties : ConsultationParties
+    time : Time
+  where
+    signatory parties.vet
+    observer parties.pet.owner
+
+    choice ConsultationProposal_Accept : ContractId VetConsultation
+      controller parties.pet.owner
+      do
+        create VetConsultation with
+          time
+          parties
+
+    choice ConsultationProposal_Decline : ContractId ConsultationRequest
+      with
+        counterTime : Time
+      controller parties.pet.owner
+      do
+        create ConsultationRequest with
+          parties
+          time = counterTime
+
+

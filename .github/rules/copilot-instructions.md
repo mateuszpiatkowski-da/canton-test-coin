@@ -1,6 +1,6 @@
 ---
 description: Use Bun instead of Node.js, npm, pnpm, or vite.
-globs: "*.ts, *.tsx, *.html, *.css, *.js, *.jsx, package.json"
+globs: '*.ts, *.tsx, *.html, *.css, *.js, *.jsx, package.json'
 alwaysApply: false
 ---
 
@@ -109,3 +109,9 @@ bun --hot ./index.ts
 ```
 
 For more information, read the Bun API docs in `node_modules/bun-types/docs/**.md`.
+
+## Daml & Canton
+
+for Daml-specific files or Canton-related issues, relate to official Digital Asset documentation: https://docs.digitalasset.com/ and all its subpages. Also, read the Canton Network API docs in `node_modules/@canton-network/**/*.md`.
+
+for `.daml` files use `pure ()` instead of `return ()`.

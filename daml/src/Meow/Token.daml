@@ -1,0 +1,30 @@
+module Meow.Token where
+
+import Splice.Api.Token.HoldingV1 qualified as Holding
+import Splice.Api.Token.MetadataV1 qualified as Metadata
+
+tokenAmount : Decimal
+tokenAmount = 1.0 -- We cannot split the pet we own
+
+data Animal = Cat
+  | Dog
+  | Rabbit
+    deriving (Eq, Show, Enum)
+
+template MeowToken
+  with
+    dso : Party
+    owner : Party
+    name : Text
+    animalType : Animal
+    birthDate : Date
+  where
+    signatory owner, dso
+
+    interface instance Holding.Holding for MeowToken where
+      view = Holding.HoldingView with
+        owner
+        instrumentId = Holding.InstrumentId with admin = dso; id = name <> "-" <> show birthDate
+        amount = tokenAmount
+        lock = None
+        meta = Metadata.emptyMetadata
