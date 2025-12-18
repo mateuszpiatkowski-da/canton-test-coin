@@ -8,6 +8,7 @@ import DA.Time qualified as Time
 import Splice.Api.Token.MetadataV1 qualified as Meta
 import Splice.Api.Token.HoldingV1 qualified as Holding
 import Splice.Api.Token.TransferInstructionV1 qualified as Transfer
+import DA.Date qualified as Date
 
 test_token = script do
   admin <- allocateParty "admin"
@@ -43,28 +44,22 @@ test_token = script do
           ]
 
   Some token <- queryContractId admin meowTokenCid
+
+  -- Set ledger time to a realistic value (e.g., 2024-01-01)
+  setTime (Time.time (Date.date 2024 Date.Jan 1) 0 0 0)
   now <- getTime
-  let nowPlus24H = Time.addRelTime now (Time.hours 24)
+  let nowPlus24H = Time.addRelTime now (Time.hours 24 + Time.minutes 25)
   let holdingView = view $ toInterface @Holding.Holding token
   let instrumentId = holdingView.instrumentId
+  let holdingCid = toInterfaceContractId @Holding.Holding meowTokenCid
 
-  transferFactoryCid <- submitMulti [admin, owner] [] $
+  transferFactoryCid <- submit admin $
     toInterfaceContractId @Transfer.TransferFactory <$> createCmd MeowTransferFactory
       with
         admin
-        tokenCid = meowTokenCid
-        tokenOwner = owner
-        transferData = Transfer.Transfer with
-          sender = token.owner
-          receiver = newOwner
-          amount = tokenAmount
-          instrumentId
-          requestedAt = now
-          executeBefore = nowPlus24H
-          inputHoldingCids = []
-          meta = Meta.emptyMetadata
 
-  submitMulti [admin, owner] [] do
+  -- Extract the transfer instruction contract ID from the result
+  result <- submitMulti [admin, owner] [] do
     exerciseCmd transferFactoryCid Transfer.TransferFactory_Transfer with
       expectedAdmin = admin
       transfer = Transfer.Transfer with
@@ -74,8 +69,20 @@ test_token = script do
         instrumentId
         requestedAt = now
         executeBefore = nowPlus24H
-        inputHoldingCids = []
+        inputHoldingCids = [holdingCid]
         meta = Meta.emptyMetadata
       extraArgs = Meta.ExtraArgs with
         context = Meta.emptyChoiceContext
         meta = Meta.emptyMetadata
+
+  let Transfer.TransferInstructionResult_Pending{transferInstructionCid} = result.output
+
+  -- Now accept the transfer as the receiver
+  submitMulti [admin, newOwner] [] do
+    exerciseCmd transferInstructionCid Transfer.TransferInstruction_Accept with
+      extraArgs = Meta.ExtraArgs with
+        context = Meta.emptyChoiceContext
+        meta = Meta.emptyMetadata
+
+  pure ()
+
