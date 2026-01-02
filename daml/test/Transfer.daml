@@ -1,0 +1,69 @@
+module Transfer where
+
+import Daml.Script
+import Meow.Transfer
+import DA.Time qualified as Time
+import Splice.Api.Token.MetadataV1 qualified as Meta
+import Splice.Api.Token.HoldingV1 qualified as Holding
+import Splice.Api.Token.TransferInstructionV1 qualified as Transfer
+import DA.Date qualified as Date
+import Fixture.Token (TokenFixture(..), setupTokenTest)
+
+test_transfer : Decimal -> Decimal -> Script ()
+test_transfer startAmount amountToTransfer = script do
+  assertMsg "startAmount and amountToTransfer must be valid" (startAmount >= amountToTransfer && amountToTransfer >= 0.0)
+  TokenFixture{admin, oldOwner, newOwner, tokenCid} <- setupTokenTest startAmount
+
+  Some token <- queryContractId admin tokenCid
+
+  -- Set ledger time to a realistic value (e.g., 2024-01-01)
+  setTime (Time.time (Date.date 2024 Date.Jan 1) 0 0 0)
+  now <- getTime
+  let nowPlus24H = Time.addRelTime now (Time.hours 24 + Time.minutes 25)
+  let holdingView = view $ toInterface @Holding.Holding token
+  let instrumentId = holdingView.instrumentId
+  let holdingCid = toInterfaceContractId @Holding.Holding tokenCid
+
+  transferFactoryCid <- submit admin $
+    toInterfaceContractId @Transfer.TransferFactory <$> createCmd MeowTransferFactory
+      with
+        admin
+
+  -- Extract the transfer instruction contract ID from the result
+  result <- submitMulti [admin, oldOwner] [] do
+    exerciseCmd transferFactoryCid Transfer.TransferFactory_Transfer with
+      expectedAdmin = admin
+      transfer = Transfer.Transfer with
+        sender = oldOwner
+        receiver = newOwner
+        amount = amountToTransfer
+        instrumentId
+        requestedAt = now
+        executeBefore = nowPlus24H
+        inputHoldingCids = [holdingCid]
+        meta = Meta.emptyMetadata
+      extraArgs = Meta.ExtraArgs with
+        context = Meta.emptyChoiceContext
+        meta = Meta.emptyMetadata
+
+  let Transfer.TransferInstructionResult_Pending{transferInstructionCid} = result.output
+
+  -- Now accept the transfer as the receiver
+  submitMulti [admin, newOwner] [] do
+    exerciseCmd transferInstructionCid Transfer.TransferInstruction_Accept with
+      extraArgs = Meta.ExtraArgs with
+        context = Meta.emptyChoiceContext
+        meta = Meta.emptyMetadata
+
+  pure ()
+
+
+test_partial_transfer : Script ()
+test_partial_transfer = script do
+  test_transfer 100.0 46.6532
+  pure ()
+
+test_full_transfer : Script ()
+test_full_transfer = script do
+  test_transfer 100.0 100.0
+  pure ()
