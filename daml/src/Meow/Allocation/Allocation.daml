@@ -7,13 +7,11 @@ import Splice.Api.Token.HoldingV1 qualified as Holding
 import Meow.Util qualified as Util
 import DA.Foldable qualified as Foldable
 
-toHoldingCids : [ContractId MeowToken] -> [ContractId Holding.Holding]
-toHoldingCids = map Util.meowTokenToHoldingCid
-
 template MeowAllocation
   with
     settlement : Alloc.SettlementInfo
     transferLeg : Alloc.TransferLeg
+    transferLegId : Text
     senderHoldingCids : [ContractId Holding.Holding]
   where
     signatory settlement.executor
@@ -23,7 +21,7 @@ template MeowAllocation
       view = Alloc.AllocationView with
         allocation = Alloc.AllocationSpecification with
           settlement
-          transferLegId = show transferLeg.sender <> "->" <> show transferLeg.receiver
+          transferLegId
           transferLeg
         holdingCids = senderHoldingCids
         meta = Meta.emptyMetadata
@@ -52,21 +50,23 @@ template MeowAllocation
           owner = transferLeg.receiver
           amount = transferLeg.amount
 
+        let receiverHoldingCids = [Util.meowTokenToHoldingCid receiverHoldingCid]
+
         -- archive all used sender's holding contracts
         Foldable.forA_ senderHoldingCids archive
 
         pure Alloc.Allocation_ExecuteTransferResult with
           senderHoldingCids = senderChangeHoldingCids
-          receiverHoldingCids = [Util.meowTokenToHoldingCid receiverHoldingCid]
+          receiverHoldingCids
           meta = Meta.emptyMetadata
 
       allocation_cancelImpl this cancelRequest = do
         pure Alloc.Allocation_CancelResult with
-          senderHoldingCids
+          senderHoldingCids = [] -- we don't lock the holdings in the allocation, so there is no need to send this back to the user
           meta = Meta.emptyMetadata
 
       allocation_withdrawImpl this withdrawRequest = do
         pure Alloc.Allocation_WithdrawResult with
-          senderHoldingCids
+          senderHoldingCids = [] -- we don't lock the holdings in the allocation, so there is no need to send this back to the user
           meta = Meta.emptyMetadata
 

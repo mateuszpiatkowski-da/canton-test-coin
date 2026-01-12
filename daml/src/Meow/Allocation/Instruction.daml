@@ -3,26 +3,27 @@ module Meow.Allocation.Instruction where
 import Splice.Api.Token.AllocationInstructionV1 qualified as AllocInstr
 import Splice.Api.Token.MetadataV1 qualified as Meta
 import DA.Map qualified as Map
-import DA.TextMap qualified as TextMap
 import Meow.Util qualified as Util
 import Meow.Allocation.Allocation
 import Splice.Api.Token.AllocationV1 qualified as Alloc
+import DA.List qualified as List
+import Splice.Api.Token.HoldingV1 qualified as Holding
 
 template MeowAllocationInstructionFactory
   with
     admin : Party
-    observers : [Party]
+    senders : [Party]
   where
     signatory admin
-    observer observers
+    observer senders
 
     -- without exercising it with sender as the observer we won't enable them to exercise the Allocation choice
     choice AddObserver : ContractId MeowAllocationInstructionFactory
       with
-        newObservers : [Party]
+        newSenders : [Party]
       controller admin
       do
-        create this with observers = observers ++ newObservers
+        create this with senders = senders ++ newSenders
 
     interface instance AllocInstr.AllocationFactory for MeowAllocationInstructionFactory where
       view = AllocInstr.AllocationFactoryView with
@@ -35,13 +36,9 @@ template MeowAllocationInstructionFactory
 
         meowAllocInstructionCid <- create MeowAllocationInstruction with
           admin
-          view = AllocInstr.AllocationInstructionView with
-            allocation = allocateRequest.allocation
-            requestedAt = allocateRequest.requestedAt
-            inputHoldingCids = allocateRequest.inputHoldingCids
-            meta = Meta.emptyMetadata
-            pendingActions = Map.fromList [(admin, "Needs to accept the instruction in order to create an allocation"), (allocateRequest.allocation.transferLeg.sender, "Can update the allocation instruction until it is accepted by the executor"), (allocateRequest.allocation.transferLeg.receiver, "Can update the allocation instruction until it is accepted by the executor")]
-            originalInstructionCid = None
+          allocation = allocateRequest.allocation
+          requestedAt = allocateRequest.requestedAt
+          inputHoldingCids = allocateRequest.inputHoldingCids
 
         let allocationInstructionCid = toInterfaceContractId @AllocInstr.AllocationInstruction meowAllocInstructionCid
 
@@ -60,13 +57,21 @@ template MeowAllocationInstructionFactory
 template MeowAllocationInstruction
   with
     admin : Party
-    view : AllocInstr.AllocationInstructionView
+    allocation : Alloc.AllocationSpecification
+    requestedAt : Time
+    inputHoldingCids : [ContractId Holding.Holding]
   where
-    signatory admin
-    observer Map.keys view.pendingActions
+    signatory admin, allocation.transferLeg.sender
+    observer allocation.settlement.executor, allocation.transferLeg.receiver
 
     interface instance AllocInstr.AllocationInstruction for MeowAllocationInstruction where
-      view = view
+      view = AllocInstr.AllocationInstructionView with
+        allocation
+        requestedAt
+        inputHoldingCids
+        meta = Meta.emptyMetadata
+        pendingActions = Map.fromList [(admin, "Needs to accept the instruction in order to create an allocation")]
+        originalInstructionCid = None
 
       allocationInstruction_withdrawImpl this withdrawRequest = do
         pure AllocInstr.AllocationInstructionResult with
@@ -75,39 +80,17 @@ template MeowAllocationInstruction
           meta = Meta.emptyMetadata
 
       allocationInstruction_updateImpl this updateRequest = do
-        -- this is made by the executor to create an allocation contract
-        if updateRequest.extraActors == [] then do
-          meowAllocationCid <- create MeowAllocation with
-            settlement = view.allocation.settlement
-            transferLeg = view.allocation.transferLeg
-            senderHoldingCids = view.inputHoldingCids
+        assertMsg "Only executor can exercise this choice" (List.length updateRequest.extraActors == 1 && List.head updateRequest.extraActors == allocation.settlement.executor)
 
-          let allocationCid = toInterfaceContractId @Alloc.Allocation meowAllocationCid
+        meowAllocationCid <- create MeowAllocation with
+          settlement = allocation.settlement
+          transferLeg = allocation.transferLeg
+          transferLegId = allocation.transferLegId
+          senderHoldingCids = inputHoldingCids
+        let allocationCid = toInterfaceContractId @Alloc.Allocation meowAllocationCid
 
-          pure AllocInstr.AllocationInstructionResult with
-            output = AllocInstr.AllocationInstructionResult_Completed with
-              allocationCid
-            senderChangeCids = []
-            meta = Meta.emptyMetadata
-        else do
-          -- this is made by both sender & receiver to update the allocation data
-          assertMsg "Both sender and receiver must be the controllers of this choice" (all (`elem` updateRequest.extraActors) [view.allocation.transferLeg.sender, view.allocation.transferLeg.receiver])
-          let newAmount = case TextMap.lookup "amount" updateRequest.extraArgs.context.values of
-                Some (Meta.AV_Decimal amount) -> amount
-                _ -> view.allocation.transferLeg.amount
-          let updatedAllocation = view.allocation with
-                transferLeg = view.allocation.transferLeg with
-                  amount = newAmount
-          let updatedView = view with
-              allocation = updatedAllocation
-              originalInstructionCid = Some (toInterfaceContractId @AllocInstr.AllocationInstruction this)
-          meowAllocationInstructionCid <- create MeowAllocationInstruction with
-            view = updatedView
-            admin
-          let allocationInstructionCid = toInterfaceContractId @AllocInstr.AllocationInstruction meowAllocationInstructionCid
-
-          pure AllocInstr.AllocationInstructionResult with
-            output = AllocInstr.AllocationInstructionResult_Pending with
-              allocationInstructionCid
-            senderChangeCids = []
-            meta = Meta.emptyMetadata
+        pure AllocInstr.AllocationInstructionResult with
+          output = AllocInstr.AllocationInstructionResult_Completed with
+            allocationCid
+          senderChangeCids = []
+          meta = Meta.emptyMetadata
