@@ -80,7 +80,7 @@ template MeowAllocationInstruction
           meta = Meta.emptyMetadata
 
       allocationInstruction_updateImpl this updateRequest = do
-        assertMsg "Only executor can exercise this choice" (List.length updateRequest.extraActors == 1 && List.head updateRequest.extraActors == allocation.settlement.executor)
+        assertMsg "Only executor with sender can exercise this choice" (List.sort updateRequest.extraActors == List.sort [allocation.settlement.executor, allocation.transferLeg.sender])
 
         meowAllocationCid <- create MeowAllocation with
           settlement = allocation.settlement

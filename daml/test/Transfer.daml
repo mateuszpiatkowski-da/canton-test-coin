@@ -7,7 +7,7 @@ import Splice.Api.Token.MetadataV1 qualified as Meta
 import Splice.Api.Token.HoldingV1 qualified as Holding
 import Splice.Api.Token.TransferInstructionV1 qualified as Transfer
 import Fixture.Token qualified as F.Token
-import Util.SetTime (set_ledger_time)
+import Util.SetTime (setLedgerTime)
 import Util.ExtraArgs (emptyExtraArgs)
 
 test_transfer : Decimal -> Decimal -> Script ()
@@ -17,7 +17,7 @@ test_transfer startAmount amountToTransfer = script do
 
   Some token <- queryContractId admin tokenCid
 
-  set_ledger_time
+  setLedgerTime
   now <- getTime
   let nowPlus24H = Time.addRelTime now (Time.hours 24 + Time.minutes 25)
   let holdingView = view $ toInterface @Holding.Holding token

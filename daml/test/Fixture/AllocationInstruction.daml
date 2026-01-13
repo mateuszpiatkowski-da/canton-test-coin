@@ -1,0 +1,94 @@
+module Fixture.AllocationInstruction where
+
+import Daml.Script
+import Meow.Allocation.Instruction qualified as MeowAllInstr
+import Fixture.Parties qualified as F.Parties
+import Util.ExtraArgs (emptyExtraArgs)
+import Allocation.AllocationRequest qualified as Test.AllocReq
+import Splice.Api.Token.AllocationRequestV1 qualified as AllocReq
+import Splice.Api.Token.AllocationV1 qualified as Alloc
+import Splice.Api.Token.AllocationInstructionV1 qualified as AllocInstr
+import DA.TextMap qualified as TM
+import Fixture.Token qualified as F.Token
+import Meow.Util qualified as Util
+import Meow.Allocation.Request
+
+data AllocationInstructionFixture = AllocationInstructionFixture with
+  allocationCid : ContractId AllocInstr.AllocationInstruction
+  anotherAllocationCid : ContractId AllocInstr.AllocationInstruction
+  parties : F.Parties.Parties
+    deriving (Eq, Show)
+
+-- where (A, B=[..]):
+-- A: amount to send to receiver
+-- B: sender holdings with given amounts
+create_allocation_instruction : (Decimal, [Decimal]) -> (Decimal, [Decimal]) -> Script AllocationInstructionFixture
+create_allocation_instruction (senderSendingAmount, senderHoldingAmounts) (anotherSenderSendingAmount, anotherSenderHoldingAmounts) = script do
+  parties@F.Parties.Parties{admin, receiver, sender, anotherSender, executor} <- F.Parties.create_parties
+
+  -- prepare allocation data via MeowAllocationRequest
+  meowAllocRequestCid <- Test.AllocReq.test_allocation_request_with_parties F.Parties.Parties{admin, receiver, sender, anotherSender, executor} (senderSendingAmount, anotherSenderSendingAmount)
+  Some meowAllocRequest <- queryContractId executor meowAllocRequestCid
+  let allocRequestView = view (toInterface @AllocReq.AllocationRequest meowAllocRequest)
+
+  let transferLegs = TM.toList allocRequestView.transferLegs
+
+  Some senderTransferLeg <- submit sender do
+    exerciseCmd meowAllocRequestCid GetTransferLeg with
+      transferLegId = "senderTransferLegId"
+      actor = sender
+  Some anotherSenderTransferLeg <- submit anotherSender do
+    exerciseCmd meowAllocRequestCid GetTransferLeg with
+      transferLegId = "anotherSenderTransferLegId"
+      actor = anotherSender
+
+  let senderAllocation = Alloc.AllocationSpecification with
+        settlement = allocRequestView.settlement
+        transferLegId = "senderTransferLegId"
+        transferLeg = senderTransferLeg
+  let anotherSenderAllocation = Alloc.AllocationSpecification with
+        settlement = allocRequestView.settlement
+        transferLegId = "anotherSenderTransferLegId"
+        transferLeg = anotherSenderTransferLeg
+
+  -- create MeowAllocationInstructionFactory
+  standaloneMeowFactoryCid <- submit admin do
+    createCmd MeowAllInstr.MeowAllocationInstructionFactory with
+      admin
+      senders = [sender]
+
+  -- test adding new sender
+  meowFactoryCid <- submit admin do
+    exerciseCmd standaloneMeowFactoryCid MeowAllInstr.AddObserver with
+      newSenders = [anotherSender]
+  let factoryCid = toInterfaceContractId @AllocInstr.AllocationFactory meowFactoryCid
+
+  now <- getTime
+
+  -- create tokens as inputs
+  senderHoldings <- mapA (fmap Util.meowTokenToHoldingCid . F.Token.create_test_token admin sender) senderHoldingAmounts
+  anotherSenderHoldings <- mapA (fmap Util.meowTokenToHoldingCid . F.Token.create_test_token admin anotherSender) anotherSenderHoldingAmounts
+
+  -- create MeowAllocationInstructions
+  factoryAllocationResult <- submit sender do
+    exerciseCmd factoryCid AllocInstr.AllocationFactory_Allocate with
+      expectedAdmin = admin
+      allocation = senderAllocation
+      requestedAt = now
+      inputHoldingCids = senderHoldings
+      extraArgs = emptyExtraArgs
+  let allocationCid = factoryAllocationResult.output.allocationInstructionCid
+
+  anotherFactoryAllocationResult <- submit anotherSender do
+    exerciseCmd factoryCid AllocInstr.AllocationFactory_Allocate with
+      expectedAdmin = admin
+      allocation = anotherSenderAllocation
+      requestedAt = now
+      inputHoldingCids = anotherSenderHoldings
+      extraArgs = emptyExtraArgs
+  let anotherAllocationCid = anotherFactoryAllocationResult.output.allocationInstructionCid
+
+  pure AllocationInstructionFixture with
+    allocationCid
+    anotherAllocationCid
+    parties

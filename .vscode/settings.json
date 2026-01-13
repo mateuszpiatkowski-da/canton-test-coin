@@ -3,7 +3,7 @@
     "**/.daml/unpacked-dars/**": true
   },
   "daml.useDPMWhenAvailable": true,
-  "cSpell.words": ["Daml", "nonconsuming"],
+  "cSpell.words": ["Daml", "fmap", "nonconsuming"],
   "editor.wordWrap": "on",
   "editor.wordWrapColumn": 120,
   "[daml]": {
