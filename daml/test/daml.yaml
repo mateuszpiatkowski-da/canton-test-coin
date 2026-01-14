@@ -1,5 +1,5 @@
 sdk-version: 3.4.9
-name: meow-coin-test
+name: test-coin-test
 source: Index.daml
 version: 1.0.0
 dependencies:

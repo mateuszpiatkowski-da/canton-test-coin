@@ -1,6 +1,6 @@
 module Fixture.Token where
 
-import Meow.Holding
+import Coin.Holding
 import Daml.Script
 import Fixture.Parties qualified as F.Parties
 
@@ -9,14 +9,14 @@ data TokenFixture = TokenFixture with
     admin : Party
     sender : Party
     receiver : Party
-    tokenCid : ContractId MeowToken
+    tokenCid : ContractId CoinToken
       deriving (Eq, Show)
 
 -- Helper function to create a token with customizable metadata
-createTestToken : Party -> Party -> Decimal -> Script (ContractId MeowToken)
+createTestToken : Party -> Party -> Decimal -> Script (ContractId CoinToken)
 createTestToken admin owner amount = do
   submit admin do
-    createCmd MeowToken with
+    createCmd CoinToken with
       admin
       owner
       amount

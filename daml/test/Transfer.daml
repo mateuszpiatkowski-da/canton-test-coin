@@ -1,7 +1,7 @@
 module Transfer where
 
 import Daml.Script
-import Meow.Transfer
+import Coin.Transfer
 import DA.Time qualified as Time
 import Splice.Api.Token.MetadataV1 qualified as Meta
 import Splice.Api.Token.HoldingV1 qualified as Holding
@@ -25,7 +25,7 @@ testTransfer startAmount amountToTransfer = script do
   let holdingCid = toInterfaceContractId @Holding.Holding tokenCid
 
   transferFactoryCid <- submit admin $
-    toInterfaceContractId @Transfer.TransferFactory <$> createCmd MeowTransferFactory
+    toInterfaceContractId @Transfer.TransferFactory <$> createCmd CoinTransferFactory
       with
         admin
 

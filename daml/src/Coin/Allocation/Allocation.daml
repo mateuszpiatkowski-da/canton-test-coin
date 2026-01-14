@@ -1,13 +1,13 @@
-module Meow.Allocation.Allocation where
+module Coin.Allocation.Allocation where
 
 import Splice.Api.Token.AllocationV1 qualified as Alloc
 import Splice.Api.Token.MetadataV1 qualified as Meta
-import Meow.Holding
+import Coin.Holding
 import Splice.Api.Token.HoldingV1 qualified as Holding
-import Meow.Util qualified as Util
+import Coin.Util qualified as Util
 import DA.Foldable qualified as Foldable
 
-template MeowAllocation
+template CoinAllocation
   with
     admin : Party
     settlement : Alloc.SettlementInfo
@@ -18,7 +18,7 @@ template MeowAllocation
     signatory settlement.executor, admin
     observer transferLeg.sender, transferLeg.receiver
 
-    interface instance Alloc.Allocation for MeowAllocation where
+    interface instance Alloc.Allocation for CoinAllocation where
       view = Alloc.AllocationView with
         allocation = Alloc.AllocationSpecification with
           settlement
@@ -37,7 +37,7 @@ template MeowAllocation
         assertMsg "Insufficient funds: sender did not provide enough resources" (senderChangeAmount >= 0.0)
 
         senderChangeHoldingCids <- if senderChangeAmount > 0.0 then do
-          meowCid <- create MeowToken with
+          meowCid <- create CoinToken with
             owner = transferLeg.sender
             admin = settlement.executor
             amount = senderChangeAmount
@@ -46,7 +46,7 @@ template MeowAllocation
           else pure []
 
         -- create receiver holding token
-        receiverHoldingCid <- create MeowToken with
+        receiverHoldingCid <- create CoinToken with
           admin = settlement.executor
           owner = transferLeg.receiver
           amount = transferLeg.amount

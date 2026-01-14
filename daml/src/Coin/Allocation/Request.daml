@@ -1,4 +1,4 @@
-module Meow.Allocation.Request where
+module Coin.Allocation.Request where
 
 import Splice.Api.Token.AllocationRequestV1 qualified as AllReq
 import Splice.Api.Token.AllocationV1 qualified as Alloc
@@ -13,7 +13,7 @@ getSenders transferLegList = map (\(_, leg) -> leg.sender) transferLegList
 getReceivers : [(Text, Alloc.TransferLeg)] -> [Party]
 getReceivers transferLegList = map (\(_, leg) -> leg.receiver) transferLegList
 
-template MeowAllocationRequest
+template CoinAllocationRequest
   with
     settlement : Alloc.SettlementInfo
     transferLegList : [(Text, Alloc.TransferLeg)]
@@ -28,14 +28,14 @@ template MeowAllocationRequest
         actor : Party
       controller actor
       do
-        assertMsg "Only signatories and observers can fetch transfer legs" 
+        assertMsg "Only signatories and observers can fetch transfer legs"
           (actor `elem` (settlement.executor :: getSenders transferLegList ++ getReceivers transferLegList))
         let index = List.findIndex (\(id, _) -> id == transferLegId) transferLegList
         pure (case index of
           Some idx -> Some (snd (transferLegList List.!! idx))
           None -> None)
 
-    interface instance AllReq.AllocationRequest for MeowAllocationRequest where
+    interface instance AllReq.AllocationRequest for CoinAllocationRequest where
       view = AllReq.AllocationRequestView with
         settlement
         transferLegs = TM.fromList transferLegList

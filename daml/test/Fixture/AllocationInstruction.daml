@@ -1,7 +1,7 @@
 module Fixture.AllocationInstruction where
 
 import Daml.Script
-import Meow.Allocation.Instruction qualified as MeowAllInstr
+import Coin.Allocation.Instruction qualified as CoinAllInstr
 import Fixture.Parties qualified as F.Parties
 import Util.ExtraArgs (emptyExtraArgs)
 import Allocation.AllocationRequest qualified as Test.AllocReq
@@ -10,8 +10,8 @@ import Splice.Api.Token.AllocationV1 qualified as Alloc
 import Splice.Api.Token.AllocationInstructionV1 qualified as AllocInstr
 import DA.TextMap qualified as TM
 import Fixture.Token qualified as F.Token
-import Meow.Util qualified as Util
-import Meow.Allocation.Request
+import Coin.Util qualified as Util
+import Coin.Allocation.Request
 
 data AllocationInstructionFixture = AllocationInstructionFixture with
   allocationCid : ContractId AllocInstr.AllocationInstruction
@@ -26,7 +26,7 @@ createAllocationInstruction : (Decimal, [Decimal]) -> (Decimal, [Decimal]) -> Sc
 createAllocationInstruction (senderSendingAmount, senderHoldingAmounts) (anotherSenderSendingAmount, anotherSenderHoldingAmounts) = script do
   parties@F.Parties.Parties{admin, receiver, sender, anotherSender, executor} <- F.Parties.createParties
 
-  -- prepare allocation data via MeowAllocationRequest
+  -- prepare allocation data via CoinAllocationRequest
   meowAllocRequestCid <- Test.AllocReq.testAllocationRequestWithParties F.Parties.Parties{admin, receiver, sender, anotherSender, executor} (senderSendingAmount, anotherSenderSendingAmount)
   Some meowAllocRequest <- queryContractId executor meowAllocRequestCid
   let allocRequestView = view (toInterface @AllocReq.AllocationRequest meowAllocRequest)
@@ -51,15 +51,15 @@ createAllocationInstruction (senderSendingAmount, senderHoldingAmounts) (another
         transferLegId = "anotherSenderTransferLegId"
         transferLeg = anotherSenderTransferLeg
 
-  -- create MeowAllocationInstructionFactory
-  standaloneMeowFactoryCid <- submit admin do
-    createCmd MeowAllInstr.MeowAllocationInstructionFactory with
+  -- create CoinAllocationInstructionFactory
+  standaloneCoinFactoryCid <- submit admin do
+    createCmd CoinAllInstr.CoinAllocationInstructionFactory with
       admin
       senders = [sender]
 
   -- test adding new sender
   meowFactoryCid <- submit admin do
-    exerciseCmd standaloneMeowFactoryCid MeowAllInstr.AddObserver with
+    exerciseCmd standaloneCoinFactoryCid CoinAllInstr.AddObserver with
       newSenders = [anotherSender]
   let factoryCid = toInterfaceContractId @AllocInstr.AllocationFactory meowFactoryCid
 
@@ -69,7 +69,7 @@ createAllocationInstruction (senderSendingAmount, senderHoldingAmounts) (another
   senderHoldings <- mapA (fmap Util.meowTokenToHoldingCid . F.Token.createTestToken admin sender) senderHoldingAmounts
   anotherSenderHoldings <- mapA (fmap Util.meowTokenToHoldingCid . F.Token.createTestToken admin anotherSender) anotherSenderHoldingAmounts
 
-  -- create MeowAllocationInstructions
+  -- create CoinAllocationInstructions
   factoryAllocationResult <- submit sender do
     exerciseCmd factoryCid AllocInstr.AllocationFactory_Allocate with
       expectedAdmin = admin

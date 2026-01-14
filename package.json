@@ -1,8 +1,11 @@
 {
-  "name": "meow-coin",
+  "name": "test-coin",
   "module": "index.ts",
   "version": "1.0.0",
   "type": "module",
+  "scripts": {
+    "daml:rebuild": "(cd ./daml && rm -rf .daml && daml clean && daml build) && (cd ./daml/test && rm -rf .daml && daml clean && daml build)"
+  },
   "devDependencies": {
     "@types/bun": "latest",
     "prettier": "^3.7.4"

@@ -1,5 +1,5 @@
 sdk-version: 3.4.9
-name: meow-coin
+name: test-coin
 source: src
 version: 1.0.0
 dependencies:

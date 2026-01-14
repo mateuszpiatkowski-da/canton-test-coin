@@ -1,4 +1,4 @@
-module Meow.Metadata where
+module Coin.Metadata where
 
 import Splice.Api.Token.MetadataV1 qualified as Meta
 import DA.TextMap qualified as TM

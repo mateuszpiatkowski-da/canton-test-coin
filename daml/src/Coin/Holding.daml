@@ -1,9 +1,9 @@
-module Meow.Holding where
+module Coin.Holding where
 
 import Splice.Api.Token.HoldingV1 qualified as Holding
-import Meow.Metadata
+import Coin.Metadata
 
-template MeowToken
+template CoinToken
   with
     admin : Party
     owner : Party
@@ -12,7 +12,7 @@ template MeowToken
     signatory admin
     observer owner
 
-    interface instance Holding.Holding for MeowToken where
+    interface instance Holding.Holding for CoinToken where
       view = Holding.HoldingView with
           owner
           instrumentId = Holding.InstrumentId

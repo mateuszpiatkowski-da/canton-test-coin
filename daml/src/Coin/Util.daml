@@ -1,7 +1,7 @@
-module Meow.Util where
+module Coin.Util where
 
 import Splice.Api.Token.HoldingV1 qualified as Holding
-import Meow.Holding
+import Coin.Holding
 
 assertExpectedAdmin : (CanAssert m) => Party -> Party -> m ()
 assertExpectedAdmin admin expectedAdmin = assertMsg "Expected admin does not match" (admin == expectedAdmin)
@@ -14,5 +14,5 @@ calculateSenderChange holdingCids amountToSend = do
   let senderInputAmountSum : Decimal = sum senderInputAmounts
   pure (senderInputAmountSum - amountToSend)
 
-meowTokenToHoldingCid : HasToInterface MeowToken Holding.Holding => ContractId MeowToken -> ContractId Holding.Holding
+meowTokenToHoldingCid : HasToInterface CoinToken Holding.Holding => ContractId CoinToken -> ContractId Holding.Holding
 meowTokenToHoldingCid meowTokenCid = toInterfaceContractId @Holding.Holding meowTokenCid

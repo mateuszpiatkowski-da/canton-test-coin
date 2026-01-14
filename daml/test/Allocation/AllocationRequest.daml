@@ -2,7 +2,7 @@ module Allocation.AllocationRequest where
 
 import Daml.Script
 import DA.Time qualified as Time
-import Meow.Allocation.Request
+import Coin.Allocation.Request
 import Splice.Api.Token.AllocationV1 qualified as Alloc
 import Splice.Api.Token.MetadataV1 qualified as Meta
 import Splice.Api.Token.HoldingV1 qualified as Holding
@@ -11,13 +11,13 @@ import Util.ExtraArgs qualified as U.ExtraArgs
 import Util.SetTime (setLedgerTime)
 import Fixture.Parties qualified as F.Parties
 
-testAllocationRequest : Script (ContractId MeowAllocationRequest)
+testAllocationRequest : Script (ContractId CoinAllocationRequest)
 testAllocationRequest = script do
   setLedgerTime
   parties <- F.Parties.createParties
   testAllocationRequestWithParties parties (100.0, 35.64564)
 
-testAllocationRequestWithParties : F.Parties.Parties -> (Decimal, Decimal) -> Script (ContractId MeowAllocationRequest)
+testAllocationRequestWithParties : F.Parties.Parties -> (Decimal, Decimal) -> Script (ContractId CoinAllocationRequest)
 testAllocationRequestWithParties F.Parties.Parties{admin, receiver, sender, anotherSender, executor} (senderAmount, anotherSenderAmount) = script do
 
   now <- getTime
@@ -53,7 +53,7 @@ testAllocationRequestWithParties F.Parties.Parties{admin, receiver, sender, anot
   let transferLegList = [("senderTransferLegId", transferLeg1), ("anotherSenderTransferLegId", transferLeg2)]
 
   meowAllocationRequestCid <- submitMulti [sender, anotherSender] [] do
-    createCmd MeowAllocationRequest with
+    createCmd CoinAllocationRequest with
       settlement
       transferLegList
   let allocationRequestCid = toInterfaceContractId @AllocReq.AllocationRequest meowAllocationRequestCid

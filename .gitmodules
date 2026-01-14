@@ -1,0 +1,3 @@
+[submodule "splice-wallet-kernel"]
+	path = splice-wallet-kernel
+	url = git@github.com:hyperledger-labs/splice-wallet-kernel.git

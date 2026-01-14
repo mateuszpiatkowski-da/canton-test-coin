@@ -1,15 +1,15 @@
-module Meow.Allocation.Instruction where
+module Coin.Allocation.Instruction where
 
 import Splice.Api.Token.AllocationInstructionV1 qualified as AllocInstr
 import Splice.Api.Token.MetadataV1 qualified as Meta
 import DA.Map qualified as Map
-import Meow.Util qualified as Util
-import Meow.Allocation.Allocation
+import Coin.Util qualified as Util
+import Coin.Allocation.Allocation
 import Splice.Api.Token.AllocationV1 qualified as Alloc
 import DA.List qualified as List
 import Splice.Api.Token.HoldingV1 qualified as Holding
 
-template MeowAllocationInstructionFactory
+template CoinAllocationInstructionFactory
   with
     admin : Party
     senders : [Party]
@@ -18,14 +18,14 @@ template MeowAllocationInstructionFactory
     observer senders
 
     -- without exercising it with sender as the observer we won't enable them to exercise the Allocation choice
-    choice AddObserver : ContractId MeowAllocationInstructionFactory
+    choice AddObserver : ContractId CoinAllocationInstructionFactory
       with
         newSenders : [Party]
       controller admin
       do
         create this with senders = senders ++ newSenders
 
-    interface instance AllocInstr.AllocationFactory for MeowAllocationInstructionFactory where
+    interface instance AllocInstr.AllocationFactory for CoinAllocationInstructionFactory where
       view = AllocInstr.AllocationFactoryView with
         admin
         meta = Meta.emptyMetadata
@@ -34,7 +34,7 @@ template MeowAllocationInstructionFactory
         assertMsg "Expected admin does not match" (allocateRequest.expectedAdmin == admin)
         Util.assertExpectedAdmin admin allocateRequest.expectedAdmin
 
-        meowAllocInstructionCid <- create MeowAllocationInstruction with
+        meowAllocInstructionCid <- create CoinAllocationInstruction with
           admin
           allocation = allocateRequest.allocation
           requestedAt = allocateRequest.requestedAt
@@ -54,7 +54,7 @@ template MeowAllocationInstructionFactory
           admin
           meta = Meta.emptyMetadata
 
-template MeowAllocationInstruction
+template CoinAllocationInstruction
   with
     admin : Party
     allocation : Alloc.AllocationSpecification
@@ -64,7 +64,7 @@ template MeowAllocationInstruction
     signatory admin, allocation.transferLeg.sender
     observer allocation.settlement.executor, allocation.transferLeg.receiver
 
-    interface instance AllocInstr.AllocationInstruction for MeowAllocationInstruction where
+    interface instance AllocInstr.AllocationInstruction for CoinAllocationInstruction where
       view = AllocInstr.AllocationInstructionView with
         allocation
         requestedAt
@@ -82,7 +82,7 @@ template MeowAllocationInstruction
       allocationInstruction_updateImpl this updateRequest = do
         assertMsg "Only executor with sender can exercise this choice" (List.sort updateRequest.extraActors == List.sort [allocation.settlement.executor, allocation.transferLeg.sender])
 
-        meowAllocationCid <- create MeowAllocation with
+        meowAllocationCid <- create CoinAllocation with
           settlement = allocation.settlement
           transferLeg = allocation.transferLeg
           transferLegId = allocation.transferLegId
