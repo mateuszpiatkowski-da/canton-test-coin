@@ -44,7 +44,7 @@ template CoinTransferFactory
             admin
             owner = transferRequest.transfer.sender
             amount = senderChange
-          let changeHoldingCid = Util.meowTokenToHoldingCid concreteChangeCid
+          let changeHoldingCid = Util.testTokenToHoldingCid concreteChangeCid
           pure [changeHoldingCid]
           else pure []
 
@@ -94,7 +94,7 @@ template CoinTransferInstruction
           owner = transfer.receiver
           amount = transfer.amount
 
-        let receiverTokenCid = Util.meowTokenToHoldingCid concreteReceiverTokenCid
+        let receiverTokenCid = Util.testTokenToHoldingCid concreteReceiverTokenCid
 
         -- Archive sender's token
         archive senderTokenCid

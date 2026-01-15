@@ -52,11 +52,11 @@ testAllocationRequestWithParties F.Parties.Parties{admin, receiver, sender, anot
         meta = Meta.emptyMetadata
   let transferLegList = [("senderTransferLegId", transferLeg1), ("anotherSenderTransferLegId", transferLeg2)]
 
-  meowAllocationRequestCid <- submitMulti [sender, anotherSender] [] do
+  testAllocationRequestCid <- submitMulti [sender, anotherSender] [] do
     createCmd CoinAllocationRequest with
       settlement
       transferLegList
-  let allocationRequestCid = toInterfaceContractId @AllocReq.AllocationRequest meowAllocationRequestCid
+  let allocationRequestCid = toInterfaceContractId @AllocReq.AllocationRequest testAllocationRequestCid
 
   -- only executor can do it
   submitMustFail sender do
@@ -70,10 +70,10 @@ testAllocationRequestWithParties F.Parties.Parties{admin, receiver, sender, anot
       extraArgs = U.ExtraArgs.emptyExtraArgs
 
   Some transferLeg <- submit executor do
-    exerciseCmd meowAllocationRequestCid GetTransferLeg with
+    exerciseCmd testAllocationRequestCid GetTransferLeg with
       transferLegId = "anotherSenderTransferLegId"
       actor = executor
 
   assertMsg "GetTransferLeg isn't working properly" (transferLeg == transferLeg2)
 
-  pure meowAllocationRequestCid
+  pure testAllocationRequestCid

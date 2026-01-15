@@ -27,18 +27,18 @@ createAllocationInstruction (senderSendingAmount, senderHoldingAmounts) (another
   parties@F.Parties.Parties{admin, receiver, sender, anotherSender, executor} <- F.Parties.createParties
 
   -- prepare allocation data via CoinAllocationRequest
-  meowAllocRequestCid <- Test.AllocReq.testAllocationRequestWithParties F.Parties.Parties{admin, receiver, sender, anotherSender, executor} (senderSendingAmount, anotherSenderSendingAmount)
-  Some meowAllocRequest <- queryContractId executor meowAllocRequestCid
-  let allocRequestView = view (toInterface @AllocReq.AllocationRequest meowAllocRequest)
+  testAllocRequestCid <- Test.AllocReq.testAllocationRequestWithParties F.Parties.Parties{admin, receiver, sender, anotherSender, executor} (senderSendingAmount, anotherSenderSendingAmount)
+  Some testAllocRequest <- queryContractId executor testAllocRequestCid
+  let allocRequestView = view (toInterface @AllocReq.AllocationRequest testAllocRequest)
 
   let transferLegs = TM.toList allocRequestView.transferLegs
 
   Some senderTransferLeg <- submit sender do
-    exerciseCmd meowAllocRequestCid GetTransferLeg with
+    exerciseCmd testAllocRequestCid GetTransferLeg with
       transferLegId = "senderTransferLegId"
       actor = sender
   Some anotherSenderTransferLeg <- submit anotherSender do
-    exerciseCmd meowAllocRequestCid GetTransferLeg with
+    exerciseCmd testAllocRequestCid GetTransferLeg with
       transferLegId = "anotherSenderTransferLegId"
       actor = anotherSender
 
@@ -58,16 +58,16 @@ createAllocationInstruction (senderSendingAmount, senderHoldingAmounts) (another
       senders = [sender]
 
   -- test adding new sender
-  meowFactoryCid <- submit admin do
+  testFactoryCid <- submit admin do
     exerciseCmd standaloneCoinFactoryCid CoinAllInstr.AddObserver with
       newSenders = [anotherSender]
-  let factoryCid = toInterfaceContractId @AllocInstr.AllocationFactory meowFactoryCid
+  let factoryCid = toInterfaceContractId @AllocInstr.AllocationFactory testFactoryCid
 
   now <- getTime
 
   -- create tokens as inputs
-  senderHoldings <- mapA (fmap Util.meowTokenToHoldingCid . F.Token.createTestToken admin sender) senderHoldingAmounts
-  anotherSenderHoldings <- mapA (fmap Util.meowTokenToHoldingCid . F.Token.createTestToken admin anotherSender) anotherSenderHoldingAmounts
+  senderHoldings <- mapA (fmap Util.testTokenToHoldingCid . F.Token.createTestToken admin sender) senderHoldingAmounts
+  anotherSenderHoldings <- mapA (fmap Util.testTokenToHoldingCid . F.Token.createTestToken admin anotherSender) anotherSenderHoldingAmounts
 
   -- create CoinAllocationInstructions
   factoryAllocationResult <- submit sender do

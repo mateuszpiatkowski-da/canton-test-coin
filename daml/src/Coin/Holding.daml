@@ -18,7 +18,7 @@ template CoinToken
           instrumentId = Holding.InstrumentId
             with
               admin
-              id = "meow-coin"
+              id = "test-coin"
           amount
           lock = None
-          meta = meowMeta
+          meta = testMeta

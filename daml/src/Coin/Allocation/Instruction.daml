@@ -34,13 +34,13 @@ template CoinAllocationInstructionFactory
         assertMsg "Expected admin does not match" (allocateRequest.expectedAdmin == admin)
         Util.assertExpectedAdmin admin allocateRequest.expectedAdmin
 
-        meowAllocInstructionCid <- create CoinAllocationInstruction with
+        testAllocInstructionCid <- create CoinAllocationInstruction with
           admin
           allocation = allocateRequest.allocation
           requestedAt = allocateRequest.requestedAt
           inputHoldingCids = allocateRequest.inputHoldingCids
 
-        let allocationInstructionCid = toInterfaceContractId @AllocInstr.AllocationInstruction meowAllocInstructionCid
+        let allocationInstructionCid = toInterfaceContractId @AllocInstr.AllocationInstruction testAllocInstructionCid
 
         pure AllocInstr.AllocationInstructionResult with
           output = AllocInstr.AllocationInstructionResult_Pending with
@@ -82,13 +82,13 @@ template CoinAllocationInstruction
       allocationInstruction_updateImpl this updateRequest = do
         assertMsg "Only executor with sender can exercise this choice" (List.sort updateRequest.extraActors == List.sort [allocation.settlement.executor, allocation.transferLeg.sender])
 
-        meowAllocationCid <- create CoinAllocation with
+        testAllocationCid <- create CoinAllocation with
           settlement = allocation.settlement
           transferLeg = allocation.transferLeg
           transferLegId = allocation.transferLegId
           senderHoldingCids = inputHoldingCids
           admin
-        let allocationCid = toInterfaceContractId @Alloc.Allocation meowAllocationCid
+        let allocationCid = toInterfaceContractId @Alloc.Allocation testAllocationCid
 
         pure AllocInstr.AllocationInstructionResult with
           output = AllocInstr.AllocationInstructionResult_Completed with

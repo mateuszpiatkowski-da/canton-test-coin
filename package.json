@@ -4,7 +4,11 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "daml:rebuild": "(cd ./daml && rm -rf .daml && daml clean && daml build) && (cd ./daml/test && rm -rf .daml && daml clean && daml build)"
+    "daml:rebuild": "(cd ./daml && rm -rf .daml && daml clean && daml build) && (cd ./daml/test && rm -rf .daml && daml clean && daml build)",
+    "dev": "bun --watch run src/index.ts"
+  },
+  "dependencies": {
+    "openapi-backend": "^5.15.0"
   },
   "devDependencies": {
     "@types/bun": "latest",
@@ -12,8 +16,5 @@
   },
   "peerDependencies": {
     "typescript": "^5"
-  },
-  "dependencies": {
-    "@canton-network/wallet-sdk": "^0.18.0"
   }
 }
