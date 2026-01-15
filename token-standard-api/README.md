@@ -1,6 +1,6 @@
 # Token Standard
 
-This directory contains files generated using `daml` from the [Splice Token Standard](https://github.com/hyperledger-labs/splice/tree/main/token-standard) DAML libraries.
+This directory contains `dar` files generated using `daml` from the [Splice Token Standard](https://github.com/hyperledger-labs/splice/tree/main/token-standard) DAML libraries as well as copied openapi `yaml` files.
 
 ## Generation
 

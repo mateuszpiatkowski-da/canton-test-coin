@@ -16,7 +16,7 @@ const adaptBunRequest = (req: Request): OpenAPIBackendRequest => {
 };
 
 const registryRoutes = {
-  '/metadata': (req: Request) => metadataApi.handleRequest(adaptBunRequest(req)),
+  '/metadata/*': (req: Request) => metadataApi.handleRequest(adaptBunRequest(req)),
 };
 
 export default {

@@ -1,5 +1,5 @@
 import { OpenAPIBackend, type Context, type Handler } from 'openapi-backend';
-import definition from '@splice/token-standard/splice-api-token-metadata-v1/openapi/token-metadata-v1.yaml';
+import definition from '@token-api/openapi/token-metadata-v1.yaml';
 
 const api = new OpenAPIBackend({ definition, quick: true });
 

@@ -17,8 +17,8 @@
     // Path aliases
     "baseUrl": ".",
     "paths": {
-      "@splice/*": ["splice/*"],
-      "@splice-wallet-kernel/*": ["splice-wallet-kernel/*"]
+      "@splice-wallet-kernel/*": ["splice-wallet-kernel/*"],
+      "@token-api/*": ["token-standard-api/*"]
     },
 
     // Best practices
