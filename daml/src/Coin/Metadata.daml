@@ -4,4 +4,4 @@ import Splice.Api.Token.MetadataV1 qualified as Meta
 import DA.TextMap qualified as TM
 
 testMeta = Meta.Metadata with
-  values = TM.fromList [("version", "1.0.0")]
+  values = TM.fromList [("purpose", "ability to implement token standard API inside Canton Network")]

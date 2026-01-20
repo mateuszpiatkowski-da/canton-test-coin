@@ -7,6 +7,9 @@ import {
   localValidatorDefault,
   localNetStaticConfig,
 } from '@canton-network/wallet-sdk';
+import { createLogger } from './logger';
+
+const logger = createLogger({ name: 'WalletSDK' });
 
 const sdk = new WalletSDKImpl().configure({
   authFactory: localNetAuthDefault,
@@ -14,6 +17,7 @@ const sdk = new WalletSDKImpl().configure({
   topologyFactory: localNetTopologyDefault,
   tokenStandardFactory: localNetTokenStandardDefault,
   validatorFactory: localValidatorDefault,
+  logger,
 });
 
 await sdk.connect();
