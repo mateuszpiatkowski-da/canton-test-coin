@@ -4,15 +4,18 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "daml:rebuild": "(cd ./daml && daml clean && daml build) && (cd ./daml/test && daml clean && daml build)",
-    "daml:generate-ts": "daml codegen js ./daml/.daml/dist/test-coin-1.0.0.dar -o ./daml-ts",
-    "daml:install-deps": "for dir in daml-ts/*/; do (cd \"$dir\" && bun install); done",
+    "daml:rebuild": "bun daml:token-standard-api && (cd ./daml && daml clean && daml build) && (cd ./daml/test && daml clean && daml build)",
+    "daml:token-standard-api": "cd ./daml/token-standard-api && daml clean && daml build",
+    "daml:generate-ts": "rm -rf ./daml-ts && daml codegen js ./daml/.daml/dist/test-coin-1.0.0.dar -o ./daml-ts",
+    "daml:install-deps": "for dir in ./daml-ts/*/; do (cd \"$dir\" && bun install); done",
     "dev": "bun --watch src/index.ts",
-    "postinstall": "[ -f ./daml/.daml/dist/test-coin-*.dar && -f ./daml-ts/* ] || (bun daml:rebuild && bun daml:generate-ts && bun daml:install-deps)"
+    "postinstall": "([ -f ./daml/.daml/dist/test-coin-*.dar ] && [ -f ./daml-ts/* ]) || (bun daml:rebuild && bun daml:generate-ts && bun daml:install-deps)"
   },
   "dependencies": {
     "@canton-network/core-token-standard": "^0.17.2",
     "@canton-network/wallet-sdk": "^0.20.0",
+    "@daml/types": "^3.4.10",
+    "axios": "^1.13.3",
     "jose": "^6.1.3",
     "openapi-backend": "^5.15.0",
     "pino": "^10.2.0",
