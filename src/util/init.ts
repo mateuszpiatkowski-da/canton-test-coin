@@ -6,7 +6,7 @@ import sdk from '../util/walletSDK';
 import Singleton from './singleton';
 import { createKeyPair, localNetStaticConfig } from '@canton-network/wallet-sdk';
 import admin from './admin';
-import { packageId } from '@daml-ts/test-coin-1.0.0';
+import { packageId } from 'src/daml-ts/test-coin-1.0.0/lib';
 
 type DARType = {
   path: string;

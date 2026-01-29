@@ -7,10 +7,9 @@ const api = new OpenAPIBackend({ definition, quick: true });
 const service = TransferService.getInstance();
 
 const getTransferFactory: Handler = async () => {
-  const result = await service.createTransferFactory();
-  console.log(result);
+  const transferFactory = await service.getTransferFactory();
   return Response.json({
-    factoryId: 'asdas',
+    factoryId: transferFactory?.factoryId,
     transferKind: 'direct',
     choiceContext: {
       choiceContextData: {},

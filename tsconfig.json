@@ -19,7 +19,7 @@
     "paths": {
       "@token-standard/*": ["./splice/token-standard/*"],
       "@openapi/*": ["./node_modules/@canton-network/core-token-standard/dist/generated-clients/*"],
-      "@daml-ts/*": ["./daml-ts/*"]
+      "@daml-ts/*": ["./src/daml-ts/*"]
     },
 
     // Best practices

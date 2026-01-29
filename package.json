@@ -6,10 +6,10 @@
   "scripts": {
     "daml:rebuild": "bun daml:token-standard-api && (cd ./daml && daml clean && daml build) && (cd ./daml/test && daml clean && daml build)",
     "daml:token-standard-api": "cd ./daml/token-standard-api && daml clean && daml build",
-    "daml:generate-ts": "rm -rf ./daml-ts && daml codegen js ./daml/.daml/dist/test-coin-1.0.0.dar -o ./daml-ts",
-    "daml:install-deps": "for dir in ./daml-ts/*/; do (cd \"$dir\" && bun install); done",
+    "daml:ts:generate": "rm -rf ./src/daml-ts && daml codegen js ./daml/.daml/dist/test-coin-1.0.0.dar -o ./src/daml-ts",
+    "daml:ts:install": "for dir in ./src/daml-ts/*/; do (cd \"$dir\" && bun install); done",
     "dev": "bun --watch src/index.ts",
-    "postinstall": "([ -f ./daml/.daml/dist/test-coin-*.dar ] && [ -f ./daml-ts/* ]) || (bun daml:rebuild && bun daml:generate-ts && bun daml:install-deps)"
+    "postinstall": "([ -f ./daml/.daml/dist/test-coin-*.dar ] && [ -f ./daml-ts/* ]) || (bun daml:rebuild && bun daml:ts:generate && bun daml:ts:install)"
   },
   "dependencies": {
     "@canton-network/core-token-standard": "^0.17.2",
