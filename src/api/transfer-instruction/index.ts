@@ -7,10 +7,10 @@ const api = new OpenAPIBackend({ definition, quick: true });
 const service = TransferService.getInstance();
 
 const getTransferFactory: Handler = async () => {
-  const transferFactory = await service.getTransferFactory();
+  const factoryId = await service.getTransferFactoryId();
   return Response.json({
-    factoryId: transferFactory?.factoryId,
-    transferKind: 'direct',
+    factoryId,
+    transferKind: 'offer',
     choiceContext: {
       choiceContextData: {},
       disclosedContracts: [],

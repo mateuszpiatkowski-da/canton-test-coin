@@ -3,7 +3,6 @@ import routes from './routes';
 import logger from './util/logger';
 import Initializer from './util/init';
 import { notFound } from './api/error';
-import sdk from './util/walletSDK';
 
 const server = serve({
   port: import.meta.env.PORT || 3001,
@@ -13,7 +12,7 @@ const server = serve({
   },
 });
 
-// init
+// Initialize prerequisites
 await Initializer.getInstance().init();
 
 logger.info(`Server running at ${server.url}`);

@@ -4,7 +4,7 @@ import { join } from 'path';
 import { readdirSync } from 'fs';
 import sdk from '../util/walletSDK';
 import Singleton from './singleton';
-import { createKeyPair, localNetStaticConfig } from '@canton-network/wallet-sdk';
+import { createKeyPair } from '@canton-network/wallet-sdk';
 import admin from './admin';
 import { packageId } from 'src/daml-ts/test-coin-1.0.0/lib';
 
@@ -21,8 +21,6 @@ export default class Initializer extends Singleton {
   }
 
   public async init() {
-    await this.initSDK();
-
     logger.info({ packageId }, 'Using .dar package');
 
     const distDir = join(import.meta.dirname, '../../daml/.daml/dist');
@@ -47,16 +45,6 @@ export default class Initializer extends Singleton {
     await this.setupAdmin();
     await sdk.connectTopology(sdk.userLedger!.getSynchronizerId());
     await this.uploadDar();
-  }
-
-  private async initSDK() {
-    // Initialize SDK connections
-    await Promise.all([
-      sdk.connect(),
-      sdk.connectAdmin(),
-      sdk.connectTopology(localNetStaticConfig.LOCALNET_SCAN_PROXY_API_URL),
-    ]);
-    logger.info('SDK connected');
   }
 
   private async setupAdmin() {
