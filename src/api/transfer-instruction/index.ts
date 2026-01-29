@@ -15,28 +15,28 @@ const getTransferFactory: Handler = async () => {
       choiceContextData: {},
       disclosedContracts: [],
     },
-  } satisfies types.operations['getTransferFactory']['responses']['200']['content']['application/json']);
+  } satisfies types.paths['/registry/transfer-instruction/v1/transfer-factory']['post']['responses']['200']['content']['application/json']);
 };
 
 const getTransferInstructionAcceptContext: Handler = () => {
   return Response.json({
     choiceContextData: {},
     disclosedContracts: [],
-  } satisfies types.operations['getTransferInstructionAcceptContext']['responses']['200']['content']['application/json']);
+  } satisfies types.paths['/registry/transfer-instruction/v1/{transferInstructionId}/choice-contexts/accept']['post']['responses']['200']['content']['application/json']);
 };
 
 const getTransferInstructionRejectContext: Handler = () => {
   return Response.json({
     choiceContextData: {},
     disclosedContracts: [],
-  } satisfies types.operations['getTransferInstructionRejectContext']['responses']['200']['content']['application/json']);
+  } satisfies types.paths['/registry/transfer-instruction/v1/{transferInstructionId}/choice-contexts/reject']['post']['responses']['200']['content']['application/json']);
 };
 
 const getTransferInstructionWithdrawContext: Handler = () => {
   return Response.json({
     choiceContextData: {},
     disclosedContracts: [],
-  } satisfies types.operations['getTransferInstructionWithdrawContext']['responses']['200']['content']['application/json']);
+  } satisfies types.paths['/registry/transfer-instruction/v1/{transferInstructionId}/choice-contexts/withdraw']['post']['responses']['200']['content']['application/json']);
 };
 
 api.register({

@@ -31,13 +31,13 @@ const getRegistryInfo: Handler = () => {
   return Response.json({
     adminId: 'test-coin-admin',
     supportedApis,
-  } satisfies types.operations['getRegistryInfo']['responses']['200']['content']['application/json']);
+  } satisfies types.paths['/registry/metadata/v1/info']['get']['responses']['200']['content']['application/json']);
 };
 
 const listInstruments: Handler = () => {
   return Response.json({
     instruments,
-  } satisfies types.operations['listInstruments']['responses']['200']['content']['application/json']);
+  } satisfies types.paths['/registry/metadata/v1/instruments']['get']['responses']['200']['content']['application/json']);
 };
 
 const getInstrument: Handler = (ctx) => {
@@ -45,7 +45,7 @@ const getInstrument: Handler = (ctx) => {
 
   if (!instrument) return notFound;
   return Response.json(
-    instrument satisfies types.operations['getInstrument']['responses']['200']['content']['application/json'],
+    instrument satisfies types.paths['/registry/metadata/v1/instruments/{instrumentId}']['get']['responses']['200']['content']['application/json'],
   );
 };
 
