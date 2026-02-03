@@ -28,4 +28,5 @@ class TestCoinWalletSDK extends Singleton {
 const testCoinWalletSDK = TestCoinWalletSDK.getInstance();
 await testCoinWalletSDK.init();
 
-export default testCoinWalletSDK.impl;
+const sdk = testCoinWalletSDK.impl;
+export default sdk;

@@ -1,1 +1,1 @@
-import * as types from '@openapi/splice-api-token-allocation-v1/allocation-v1';
+import * as openapi from '@openapi-ts/allocation-v1';

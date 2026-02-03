@@ -18,8 +18,8 @@
     "baseUrl": ".",
     "paths": {
       "@token-standard/*": ["./splice/token-standard/*"],
-      "@openapi/*": ["./node_modules/@canton-network/core-token-standard/dist/generated-clients/*"],
-      "@daml-ts/*": ["./src/daml-ts/*"]
+      "@openapi-ts/*": ["src/types/openapi-ts/*"],
+      "@daml-ts/*": ["./src/types/daml-ts/*"]
     },
 
     // Best practices

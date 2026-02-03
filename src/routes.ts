@@ -17,9 +17,9 @@ const adaptBunRequest = (req: BunRequest): OpenAPIBackendRequest => {
 
 export default {
   '/registry/metadata/v1/*': async (req: BunRequest) => {
-    return await metadataApi.handleRequest(adaptBunRequest(req));
+    return Response.json(await metadataApi.handleRequest(adaptBunRequest(req)));
   },
   '/registry/transfer-instruction/v1/*': async (req: BunRequest) => {
-    return await transferInstructionApi.handleRequest(adaptBunRequest(req));
+    return Response.json(await transferInstructionApi.handleRequest(adaptBunRequest(req)));
   },
 } satisfies Serve.Routes<undefined, string>;

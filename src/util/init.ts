@@ -4,9 +4,8 @@ import { join } from 'path';
 import { readdirSync } from 'fs';
 import sdk from '../util/walletSDK';
 import Singleton from './singleton';
-import { createKeyPair } from '@canton-network/wallet-sdk';
 import admin from './admin';
-import { packageId } from 'src/daml-ts/test-coin-1.0.0/lib';
+import { packageId } from '@daml-ts/test-coin-1.0.0/lib';
 
 type DARType = {
   path: string;
@@ -48,11 +47,7 @@ export default class Initializer extends Singleton {
   }
 
   private async setupAdmin() {
-    const { privateKey, publicKey } = createKeyPair();
-    admin.keyPair.privateKey = privateKey;
-    admin.keyPair.publicKey = publicKey;
-
-    const transactionResponse = await sdk.userLedger?.signAndAllocateExternalParty(privateKey, 'admin');
+    const transactionResponse = await sdk.userLedger?.signAndAllocateExternalParty(admin.keyPair.privateKey, 'admin');
     admin.partyId = transactionResponse!.partyId;
     await sdk.setPartyId(admin.partyId);
     logger.info('Successfully created admin party');

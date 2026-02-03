@@ -1,1 +1,6 @@
-export const notFound = new Response('Not Found', { status: 404 });
+export const notFound = Response.json(
+  {
+    error: 'Not Found',
+  },
+  { status: 404 },
+);

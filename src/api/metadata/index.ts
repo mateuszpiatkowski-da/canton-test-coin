@@ -1,7 +1,8 @@
-import { OpenAPIBackend, type Handler } from 'openapi-backend';
+import { OpenAPIBackend, type Context } from 'openapi-backend';
 import definition from '@token-standard/splice-api-token-metadata-v1/openapi/token-metadata-v1.yaml';
-import * as types from '@openapi/splice-api-token-metadata-v1/token-metadata-v1';
 import { notFound } from '../error';
+import * as openapi from 'src/types/openapi-ts/token-metadata-v1';
+import admin from 'src/util/admin';
 
 const api = new OpenAPIBackend({
   definition,
@@ -27,26 +28,24 @@ const instruments = [
   },
 ];
 
-const getRegistryInfo: Handler = () => {
-  return Response.json({
-    adminId: 'test-coin-admin',
+const getRegistryInfo = async (): Promise<openapi.GetRegistryInfoResponse> => {
+  return {
+    adminId: admin.partyId,
     supportedApis,
-  } satisfies types.paths['/registry/metadata/v1/info']['get']['responses']['200']['content']['application/json']);
+  };
 };
 
-const listInstruments: Handler = () => {
-  return Response.json({
+const listInstruments = (): openapi.ListInstrumentsResponse => {
+  return {
     instruments,
-  } satisfies types.paths['/registry/metadata/v1/instruments']['get']['responses']['200']['content']['application/json']);
+  };
 };
 
-const getInstrument: Handler = (ctx) => {
+const getInstrument = (ctx: Context) => {
   const instrument = instruments.find((instrument) => instrument.id === ctx.request.params.instrumentId);
 
-  if (!instrument) return notFound;
-  return Response.json(
-    instrument satisfies types.paths['/registry/metadata/v1/instruments/{instrumentId}']['get']['responses']['200']['content']['application/json'],
-  );
+  if (!instrument) throw new Error(notFound.statusText);
+  return instrument;
 };
 
 api.register({

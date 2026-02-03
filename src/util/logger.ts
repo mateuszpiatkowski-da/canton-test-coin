@@ -1,7 +1,7 @@
 import pino from 'pino';
 
-export const createLogger = (options: { name: string }) =>
-  pino({
+export const createLogger = (options: { name: string }) => {
+  return pino({
     name: options.name,
     transport: {
       target: 'pino-pretty',
@@ -10,5 +10,6 @@ export const createLogger = (options: { name: string }) =>
       },
     },
   });
+};
 
 export default createLogger({ name: 'server' });

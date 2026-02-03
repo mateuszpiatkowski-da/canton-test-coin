@@ -5,7 +5,7 @@ import Initializer from './util/init';
 import { notFound } from './api/error';
 
 const server = serve({
-  port: import.meta.env.PORT || 3001,
+  port: process.env.PORT || 3001,
   routes,
   fetch() {
     return notFound;
