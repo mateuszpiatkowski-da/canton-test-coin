@@ -13,9 +13,9 @@
     "generate:all": "rm -rf ./src/types/{daml-ts,openapi-ts} && bun daml:rebuild && bun generate:daml-ts && bun generate:openapi"
   },
   "dependencies": {
-    "@canton-network/core-ledger-client": "^0.27.0",
-    "@canton-network/core-token-standard": "^0.19.0",
-    "@canton-network/wallet-sdk": "link:@canton-network/wallet-sdk",
+    "@canton-network/core-ledger-client": "workspace:*",
+    "@canton-network/core-token-standard": "workspace:*",
+    "@canton-network/wallet-sdk": "workspace:*",
     "@daml/types": "^3.4.10",
     "openapi-backend": "^5.15.0",
     "openapicmd": "^2.7.0",
@@ -28,5 +28,16 @@
   },
   "peerDependencies": {
     "typescript": "^5"
-  }
+  },
+  "workspaces": [
+    "splice-wallet-kernel/api-specs",
+    "splice-wallet-kernel/core/*",
+    "splice-wallet-kernel/damljs/**",
+    "splice-wallet-kernel/docs/wallet-integration-guide/examples",
+    "splice-wallet-kernel/examples/*",
+    "splice-wallet-kernel/sdk/*",
+    "splice-wallet-kernel/scripts",
+    "splice-wallet-kernel/mock-oauth2",
+    "splice-wallet-kernel/wallet-gateway/*"
+  ]
 }

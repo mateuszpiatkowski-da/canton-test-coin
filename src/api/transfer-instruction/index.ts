@@ -26,17 +26,19 @@ const getTransferInstructionAcceptContext = async (ctx: Context): Promise<openap
   };
 };
 
-const getTransferInstructionRejectContext = async (): Promise<openapi.ChoiceContext> => {
+const getTransferInstructionRejectContext = async (ctx: Context): Promise<openapi.ChoiceContext> => {
+  const disclosedContract = await service.getTransferInstruction(ctx.request.params.transferInstructionId);
   return {
     choiceContextData: {},
-    disclosedContracts: [],
+    disclosedContracts: [disclosedContract],
   };
 };
 
-const getTransferInstructionWithdrawContext = async (): Promise<openapi.ChoiceContext> => {
+const getTransferInstructionWithdrawContext = async (ctx: Context): Promise<openapi.ChoiceContext> => {
+  const disclosedContract = await service.getTransferInstruction(ctx.request.params.transferInstructionId);
   return {
     choiceContextData: {},
-    disclosedContracts: [],
+    disclosedContracts: [disclosedContract],
   };
 };
 
