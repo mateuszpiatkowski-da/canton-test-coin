@@ -55,7 +55,7 @@ createAllocationInstruction (senderSendingAmount, senderHoldingAmounts) (another
   standaloneCoinFactoryCid <- submit admin do
     createCmd CoinAllInstr.CoinAllocationInstructionFactory with
       admin
-      senders = [sender]
+      senders = Some [sender]
 
   -- test adding new sender
   testFactoryCid <- submit admin do

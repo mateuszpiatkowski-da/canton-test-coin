@@ -8,18 +8,16 @@ import { CoinToken } from '@daml-ts/test-coin-1.0.0/lib/Coin/Holding';
 import { TransferFactory } from '@daml-ts/splice-api-token-1.0.0/lib/Splice/Api/Token/TransferInstructionV1/module';
 import { CoinTransferInstruction } from '@daml-ts/test-coin-1.0.0/lib/Coin/Transfer';
 import { type components as ledgerClientComponents } from '@canton-network/core-ledger-client';
-import TransferService from 'src/api/transfer-instruction/service';
-import HelperInitializer from './helperInitializer';
+import transferService from 'src/api/transfer-instruction/service';
+import helperInitializer from './helperInitializer';
 import { randomUUIDv7 } from 'bun';
 import { createLogger } from 'src/util/logger';
 
 const logger = createLogger({ name: 'createTransferInstruction' });
 
-await HelperInitializer.getInstance().init();
+await helperInitializer.init();
 
-const service = TransferService.getInstance();
-
-const factoryID = await service.getTransferFactoryId();
+const factoryID = await transferService.getFactoryCID();
 
 const senderKey = createKeyPair();
 const receiverKey = createKeyPair();

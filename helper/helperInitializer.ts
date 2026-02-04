@@ -1,9 +1,9 @@
-import Initializer from 'src/util/init';
+import { Initializer } from 'src/util/init';
 import getAdmin from './getAdmin';
 import admin from 'src/util/admin';
 import sdk from 'src/util/walletSDK';
 
-export default class HelperInitializer extends Initializer {
+class HelperInitializer extends Initializer {
   constructor() {
     super();
   }
@@ -19,3 +19,6 @@ export default class HelperInitializer extends Initializer {
     await sdk.setPartyId(admin.partyId);
   }
 }
+
+const helperInitializer = new HelperInitializer();
+export default helperInitializer;

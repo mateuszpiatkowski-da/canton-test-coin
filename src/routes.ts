@@ -1,5 +1,7 @@
 import metadataApi from './api/metadata';
 import transferInstructionApi from './api/transfer-instruction';
+import allocationInstructionApi from './api/allocation-instruction';
+import allocationApi from './api/allocation';
 import { type Request as OpenAPIBackendRequest } from 'openapi-backend';
 import { type BunRequest, type Serve } from 'bun';
 
@@ -21,5 +23,11 @@ export default {
   },
   '/registry/transfer-instruction/v1/*': async (req: BunRequest) => {
     return Response.json(await transferInstructionApi.handleRequest(adaptBunRequest(req)));
+  },
+  '/registry/allocation-instruction/v1/*': async (req: BunRequest) => {
+    return Response.json(await allocationInstructionApi.handleRequest(adaptBunRequest(req)));
+  },
+  '/registry/allocation/v1/*': async (req: BunRequest) => {
+    return Response.json(await allocationApi.handleRequest(adaptBunRequest(req)));
   },
 } satisfies Serve.Routes<undefined, string>;

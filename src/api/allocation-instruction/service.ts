@@ -1,7 +1,11 @@
-import FetchTemplateFactory from 'src/types/factory';
+import { CoinAllocationInstructionFactory } from '@daml-ts/test-coin-1.0.0/lib/Coin/Allocation/Instruction';
+import FetchTemplateFactory from 'src/api/common/factory';
 
-export default class AllocationInstructionService extends FetchTemplateFactory {
+class AllocationInstructionService extends FetchTemplateFactory {
   constructor() {
-    super();
+    super(CoinAllocationInstructionFactory.templateId);
   }
 }
+
+const service = new AllocationInstructionService();
+export default service;

@@ -1,7 +1,7 @@
 import { serve } from 'bun';
 import routes from './routes';
 import logger from './util/logger';
-import Initializer from './util/init';
+import initializer from './util/init';
 import { notFound } from './api/error';
 
 const server = serve({
@@ -13,6 +13,6 @@ const server = serve({
 });
 
 // Initialize prerequisites
-await Initializer.getInstance().init();
+await initializer.init();
 
 logger.info(`Server running at ${server.url}`);

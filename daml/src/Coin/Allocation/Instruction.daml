@@ -8,14 +8,15 @@ import Coin.Allocation.Allocation
 import Splice.Api.Token.AllocationV1 qualified as Alloc
 import DA.List qualified as List
 import Splice.Api.Token.HoldingV1 qualified as Holding
+import DA.Optional qualified as Optional
 
 template CoinAllocationInstructionFactory
   with
     admin : Party
-    senders : [Party]
+    senders : Optional [Party]
   where
     signatory admin
-    observer senders
+    observer Optional.fromOptional []senders
 
     -- without exercising it with sender as the observer we won't enable them to exercise the Allocation choice
     choice AddObserver : ContractId CoinAllocationInstructionFactory
@@ -23,7 +24,7 @@ template CoinAllocationInstructionFactory
         newSenders : [Party]
       controller admin
       do
-        create this with senders = senders ++ newSenders
+        create this with senders = Some (Optional.fromOptional newSenders senders ++ newSenders)
 
     interface instance AllocInstr.AllocationFactory for CoinAllocationInstructionFactory where
       view = AllocInstr.AllocationFactoryView with
