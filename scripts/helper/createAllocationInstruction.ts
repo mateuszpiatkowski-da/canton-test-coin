@@ -16,7 +16,7 @@ import emptyMeta from './util/emptyMeta';
 import emptyExtraArgs from './util/emptyExtraArgs';
 import { CoinAllocationInstruction } from '@daml-ts/test-coin-1.0.0/lib/Coin/Allocation/Instruction/module';
 
-const logger = createLogger({ name: 'createTransferInstruction' });
+const logger = createLogger({ name: 'createAllocationInstruction' });
 
 const createAllocationInstruction = async () => {
   await helperInitializer.init();

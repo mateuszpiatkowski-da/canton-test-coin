@@ -15,7 +15,7 @@ import {
 } from '@daml-ts/splice-api-token-1.0.0/lib/Splice/Api/Token/AllocationInstructionV1/module';
 import { CoinAllocation } from '@daml-ts/test-coin-1.0.0/lib/Coin/Allocation/Allocation/module';
 
-const logger = createLogger({ name: 'createTransferInstruction' });
+const logger = createLogger({ name: 'createAllocation' });
 
 const createAllocation = async () => {
   await helperInitializer.init();
