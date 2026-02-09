@@ -1,7 +1,7 @@
 import { CoinAllocationInstructionFactory } from '@daml-ts/test-coin-1.0.0/lib/Coin/Allocation/Instruction';
 import type { WrappedCommand } from '@canton-network/wallet-sdk';
 import type { PartyId } from '@canton-network/core-types';
-import FetchTemplateFactory from 'src/api/common/factory';
+import FetchTemplateFactory from 'src/api/common/templateFactory';
 import sdk from 'src/util/walletSDK';
 import admin from 'src/util/admin';
 import { randomUUIDv7 } from 'bun';

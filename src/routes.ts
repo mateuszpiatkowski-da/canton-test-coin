@@ -27,7 +27,7 @@ export default {
   '/registry/allocation-instruction/v1/*': async (req: BunRequest) => {
     return Response.json(await allocationInstructionApi.handleRequest(adaptBunRequest(req)));
   },
-  '/registry/allocation/v1/*': async (req: BunRequest) => {
+  '/registry/allocations/v1/*': async (req: BunRequest) => {
     return Response.json(await allocationApi.handleRequest(adaptBunRequest(req)));
   },
 } satisfies Serve.Routes<undefined, string>;

@@ -11,3 +11,4 @@
 2. [Logger must be passed as arg to `.configure()` so it can't be optional](./src/walletSdk.ts) (the absence of logger will produce errors)
 3. Merge changes from `mateuszpiatkowski-da/canton-test-coin` branch in splice-wallet-kernel into main branch (includes multi-signature support for `executeSubmission` methods)
 4. Currently `@canton-network/core-token-standard` uses `openapi typegen` to generate ts files for frontend clients. However, it should also propagate files for backend using `openapi typegen --backend` (see more about [typegen for backend](https://openapistack.co/docs/openapicmd/intro/#openapi-typegen-definition)).
+5. types between `@canton-network/core-wallet-dapp-remote-rpc-client`/`@canton-network/core-client-ledger` and generated types in `@openapi-ts` are different (some properties are optional while they shouldn't be)

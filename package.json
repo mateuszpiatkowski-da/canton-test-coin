@@ -20,6 +20,7 @@
     "@canton-network/core-token-standard": "workspace:*",
     "@canton-network/wallet-sdk": "workspace:*",
     "@canton-network/core-types": "workspace:*",
+    "@canton-network/core-wallet-dapp-remote-rpc-client": "workspace:*",
     "@daml/types": "^3.4.10",
     "openapi-backend": "^5.15.0",
     "openapicmd": "^2.7.0",
