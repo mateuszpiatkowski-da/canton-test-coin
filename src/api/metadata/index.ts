@@ -18,7 +18,7 @@ const supportedApis = {
 
 const instruments = [
   {
-    id: 'TestCoin',
+    id: 'test-coin',
     name: 'TestCoin',
     symbol: 'test-coin',
     totalSupply: '1_000_000_000',
@@ -40,9 +40,11 @@ const getRegistryInfo = async (): Promise<Response> => {
 };
 
 const listInstruments = (): Response => {
+  // we don't need to use pageSize & pageToken here
   try {
     return Response.json({
       instruments,
+      nextPageToken: undefined,
     } satisfies openapi.ListInstrumentsResponse);
   } catch (error) {
     return internalError(`Failed to list instruments: ${error}`);

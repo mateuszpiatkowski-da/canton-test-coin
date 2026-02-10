@@ -14,5 +14,14 @@ export const internalError = (reason?: string) =>
     { status: 500 },
   );
 
+export const badRequestError = (reason?: string) =>
+  Response.json(
+    {
+      error: reason ?? 'Bad Request',
+    },
+    { status: 400 },
+  );
+
 export const defaultNotFoundError = notFoundError();
 export const defaultInternalError = internalError();
+export const defaultBadRequestError = badRequestError();
