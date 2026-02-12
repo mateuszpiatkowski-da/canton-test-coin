@@ -1,14 +1,26 @@
 # Improvements
 
-## Token Standard API
+## Project
 
-1. make splice/token-standard a publishable package - will ease up the process of importing `.dar` files
-2. Bundle `.dar`/`.daml` and `.yaml`/generated `.ts` files together for the token standard API
+1. implement unit tests
+2. integrate with [splice-wallet-kernel example scripts](./splice-wallet-kernel/docs/wallet-integration-guide/examples/scripts/) to see if they pass
 
-## Docs
+## Dependencies
+
+### Submodules
+
+In order to sever connection between this project and submodules we need to:
+
+1. Merge changes from `mateuszpiatkowski-da/canton-test-coin` branch in splice-wallet-kernel into main branch (includes multi-signature support for `executeSubmission` methods) or make another way to support multi-party signing and execution
+2. Make splice/token-standard a publishable package - will ease up the process of importing `.dar` files
+3. Bundle `.dar`/`.daml` and `.yaml`/generated `.ts` files together for the token standard API
+
+### Types
+
+1. Currently `@canton-network/core-token-standard` uses `openapi typegen` to generate ts files for frontend clients. However, it should also propagate files for backend using `openapi typegen --backend` (see more about [typegen for backend](https://openapistack.co/docs/openapicmd/intro/#openapi-typegen-definition)).
+2. types between `@canton-network/core-wallet-dapp-remote-rpc-client`/`@canton-network/core-client-ledger` and generated types in `@openapi-ts` are different (some properties are optional while they shouldn't be)
+
+### Docs
 
 1. ["To learn about the Daml packages, see :brokenref:'DAR files and Daml packages' in the key concepts section."](https://docs.digitalasset.com/build/3.4/sdlc-howtos/applications/develop/manage-daml-packages.html#how-to-upload-and-query-daml-packages)
 2. [Logger must be passed as arg to `.configure()` so it can't be optional](./src/walletSdk.ts) (the absence of logger will produce errors)
-3. Merge changes from `mateuszpiatkowski-da/canton-test-coin` branch in splice-wallet-kernel into main branch (includes multi-signature support for `executeSubmission` methods)
-4. Currently `@canton-network/core-token-standard` uses `openapi typegen` to generate ts files for frontend clients. However, it should also propagate files for backend using `openapi typegen --backend` (see more about [typegen for backend](https://openapistack.co/docs/openapicmd/intro/#openapi-typegen-definition)).
-5. types between `@canton-network/core-wallet-dapp-remote-rpc-client`/`@canton-network/core-client-ledger` and generated types in `@openapi-ts` are different (some properties are optional while they shouldn't be)
