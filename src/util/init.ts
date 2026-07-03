@@ -2,7 +2,7 @@ import logger from './logger';
 import { $, file } from 'bun';
 import { join } from 'path';
 import { readdirSync } from 'fs';
-import sdk from '../util/walletSDK';
+import sdk from './sdk';
 import admin from './admin';
 import { packageId } from '@daml-ts/test-coin-1.0.0/lib';
 
@@ -37,14 +37,18 @@ export class Initializer {
     };
 
     await this.setupAdmin();
-    await sdk.connectTopology(sdk.userLedger!.getSynchronizerId());
     await this.uploadDar();
   }
 
   private async setupAdmin() {
-    const transactionResponse = await sdk.userLedger?.signAndAllocateExternalParty(admin.keyPair.privateKey, 'admin');
-    admin.partyId = transactionResponse!.partyId;
-    await sdk.setPartyId(admin.partyId);
+    const transactionResponse = await sdk.party.external
+      .create(admin.keyPair.publicKey, {
+        isAdmin: true,
+        partyHint: 'admin',
+      })
+      .sign(admin.keyPair.privateKey)
+      .execute();
+    admin.partyId = transactionResponse.partyId;
     logger.info('Successfully created admin party');
   }
 

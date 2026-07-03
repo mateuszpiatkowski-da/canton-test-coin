@@ -15,10 +15,9 @@
     "noEmit": true,
 
     // Path aliases
-    "baseUrl": ".",
     "paths": {
       "@token-standard/*": ["./splice/token-standard/*"],
-      "@openapi-ts/*": ["src/types/openapi-ts/*"],
+      "@openapi-ts/*": ["./src/types/openapi-ts/*"],
       "@daml-ts/*": ["./src/types/daml-ts/*"]
     },
 
